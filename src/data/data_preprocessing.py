@@ -68,7 +68,7 @@ def data_preprocessing() -> None:
         train_processed_data = _normalize_text(train_data)
         test_processed_data = _normalize_text(test_data)
         
-        data_path = os.path.join("data", "preprocessed")
+        data_path = os.path.join("data", "interim")
         os.makedirs(data_path, exist_ok=True)
         
         train_processed_data.to_csv(os.path.join(data_path, "train_processed.csv"), index=False)
