@@ -15,11 +15,11 @@ def model_evaluation() -> None:
     """
     try:
         logging.info("Loading model from model.pkl")
-        with open('model.pkl', 'rb') as f:
+        with open('./models/model.pkl', 'rb') as f:
             clf = pickle.load(f)
         
         logging.info("Loading test data")
-        test_data = pd.read_csv('./data/features/test_bow.csv')
+        test_data = pd.read_csv('./data/processed/test_bow.csv')
 
         X_test = test_data.iloc[:, 0:-1].values
         y_test = test_data.iloc[:, -1].values
@@ -44,7 +44,7 @@ def model_evaluation() -> None:
         logging.info(f"Metrics: {metrics_dict}")
         
         logging.info("Saving metrics to metrics.json")
-        with open('metrics.json', 'w') as f:
+        with open('./reports/metrics.json', 'w') as f:
             json.dump(metrics_dict, f, indent=4)
         
         logging.info("Model evaluation completed successfully")
