@@ -1,0 +1,29 @@
+base:
+  project_name: tweet-sentiment-analysis
+  random_state: 42
+
+data_ingestion:
+  dataset_url: 'https://raw.githubusercontent.com/campusx-official/jupyter-masterclass/main/tweet_emotions.csv'
+  test_size: 0.2
+  output_dir: data/raw
+
+data_preprocessing:
+  train_data_path: data/raw/train.csv
+  test_data_path: data/raw/test.csv
+  output_dir: data/preprocessed
+
+feature_engineering:
+  train_data_path: data/preprocessed/train_processed.csv
+  test_data_path: data/preprocessed/test_processed.csv
+  max_features: 5000
+  output_dir: data/features
+
+model_building:
+  train_data_path: data/features/train_bow.csv
+  n_estimators: 100
+  learning_rate: 0.1
+  model_dir: models
+
+model_evaluation:
+  test_data_path: data/features/test_bow.csv
+  metrics_path: metrics.json

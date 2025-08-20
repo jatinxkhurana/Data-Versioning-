@@ -1,33 +1,60 @@
-import numpy as np
-import pandas as pd
-
-import pickle
 import json
+import pickle
+import sys
+import logging
+import pandas as pd
+from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
+from typing import Dict
 
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score, recall_score, roc_auc_score
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-clf = pickle.load(open('model.pkl','rb'))
-test_data = pd.read_csv('./data/features/test_bow.csv')
+def model_evaluation() -> None:
+    """
+    Evaluates the trained model on the test set and saves the metrics.
+    """
+    try:
+        logging.info("Loading model from model.pkl")
+        with open('model.pkl', 'rb') as f:
+            clf = pickle.load(f)
+        
+        logging.info("Loading test data")
+        test_data = pd.read_csv('./data/features/test_bow.csv')
 
-X_test = test_data.iloc[:,0:-1].values
-y_test = test_data.iloc[:,-1].values
+        X_test = test_data.iloc[:, 0:-1].values
+        y_test = test_data.iloc[:, -1].values
 
-y_pred = clf.predict(X_test)
-y_pred_proba = clf.predict_proba(X_test)[:, 1]
+        logging.info("Making predictions on the test set")
+        y_pred = clf.predict(X_test)
+        y_pred_proba = clf.predict_proba(X_test)[:, 1]
 
-# Calculate evaluation metrics
-accuracy = accuracy_score(y_test, y_pred)
-precision = precision_score(y_test, y_pred)
-recall = recall_score(y_test, y_pred)
-auc = roc_auc_score(y_test, y_pred_proba)
+        logging.info("Calculating evaluation metrics")
+        accuracy: float = accuracy_score(y_test, y_pred)
+        precision: float = precision_score(y_test, y_pred)
+        recall: float = recall_score(y_test, y_pred)
+        auc: float = roc_auc_score(y_test, y_pred_proba)
+        
+        metrics_dict: Dict[str, float] = {
+            'accuracy': accuracy,
+            'precision': precision,
+            'recall': recall,
+            'auc': auc
+        }
+        
+        logging.info(f"Metrics: {metrics_dict}")
+        
+        logging.info("Saving metrics to metrics.json")
+        with open('metrics.json', 'w') as f:
+            json.dump(metrics_dict, f, indent=4)
+        
+        logging.info("Model evaluation completed successfully")
 
-metrics_dict={
-    'accuracy':accuracy,
-    'precision':precision,
-    'recall':recall,
-    'auc':auc
-}
+    except FileNotFoundError as e:
+        logging.error(f"File not found: {e}. Please run the previous pipeline steps.")
+        sys.exit(1)
+    except Exception as e:
+        logging.error(f"An error occurred during model evaluation: {e}")
+        sys.exit(1)
 
-with open('metrics.json', 'w') as file:
-    json.dump(metrics_dict, file, indent=4)
+if __name__ == '__main__':
+    model_evaluation()
